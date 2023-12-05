@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.sportsplus.app.mapper.ReplyMapper" >
+		
+	<select id="getReplyList" resultType="Reply">
+		SELECT 
+		    no,
+		    bbs_no AS bbsNo,
+		    writer,
+		    content,
+		    reg_date AS regDate
+		FROM 
+		    reply
+		WHERE 
+		    bbs_no = #{no}
+		ORDER BY 
+		    no DESC;
+	</select>
+	
+	<insert id="addReply" parameterType="Reply">
+		insert into reply value(null, #{bbsNo}, #{writer}, #{content}, now())
+	</insert>
+	
+	<update id="updateReply" parameterType="Reply">
+		update reply set content = #{content}, reg_date = now() where no = #{no}
+	</update>
+
+	<delete id="deleteReply" parameterType="Reply">
+		delete from reply where no = #{no}
+	</delete>
+</mapper>

@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.sportsplus.app.mapper.MemberMapper" >
+
+	<insert id="addMember" parameterType="Member">
+		insert into member values(#{id}, #{pass}, #{name}, #{email}, now())
+	</insert>
+	
+	<select id="getMember" resultType="Member" resultMap="memberMap">
+		select * from member where id = #{id}
+	</select>
+	
+	<update id="updateMember" parameterType="Member">
+		update member set pass = #{pass}, email = #{email} where id = #{id}
+	</update>
+	
+	<select id="idFind" parameterType="Member" resultMap="memberMap" resultType="Member">
+		select * from member where name = #{name} and email = #{email}
+	</select>
+	
+	<resultMap id="memberMap" type="Member">
+		<id property="id" column="id"/>
+		<result property="pass" column="pass"/>
+		<result property="name" column="name"/>
+		<result property="email" column="email"/>
+		<result property="regDate" column="reg_date"/>
+	</resultMap>
+
+</mapper>

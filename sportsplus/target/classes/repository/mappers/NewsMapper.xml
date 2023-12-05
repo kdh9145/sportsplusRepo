@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.sportsplus.app.mapper.NewsMapper" >
+		
+	<insert id="writeArticle" parameterType="News">
+		insert into article(category, title, thumbnail, description, content, reg_date, modify_date) 
+		value(#{category}, #{title}, #{thumbnail}, #{description}, #{content}, now(), now())
+	</insert>
+	
+	<update id="updateArticle" parameterType="News">
+		update article set category = #{category}, title = #{title}, thumbnail = #{thumbnail}, description = #{description}, content = #{content}, 
+		modify_date = now() where no = #{no}
+	</update>
+	
+	<delete id="deleteArticle">
+		delete from article where no = #{no}
+	</delete>
+	
+	<select id="getNewsList" resultType="News" parameterType="hashmap" resultMap="newsListMap">
+		select * from article
+		<where>
+			<if test="cat != 'all'">
+				category = #{cat} 
+			</if>
+			<if test="cat == 'all' and keyword != 'null'">
+				title like concat('%', #{keyword}, '%')
+			</if>
+		</where>
+		
+		<if test="type == 'latest'">
+			order by reg_date desc 
+		</if>
+		<if test="type == 'popular'">
+			order by read_count desc 
+		</if>
+		limit #{start}, #{end}
+		
+		
+	</select>
+	
+	<select id="getNews" resultType="News" parameterType="int" resultMap="newsListMap">
+		select * from article where no = #{no}
+	</select>
+	
+	<select id="getNewsCount" resultType="int" parameterType="hashmap">
+		select count(*) from article 
+		<where>
+			<if test="cat != 'all'">
+				category = #{cat}
+			</if>
+		</where>
+	</select>
+	
+	<update id="incrementReadCount" parameterType="int">
+		update article set read_count = read_count + 1 where no = #{no}
+	</update>
+	
+	<update id="incrementLikeHate" parameterType="hashmap">
+		update article set 
+		<if test="func == 'addLike'">
+			like_count = like_count + 1 		
+		</if>
+		<if test="func == 'addHate'">
+			hate_count = hate_count + 1 		
+		</if>
+		where no = #{no}
+	</update>
+	
+	<select id="getLikeHateCount" resultType="News" resultMap="newsListMap">
+		select like_count, hate_count from article where no = #{no}
+	</select>
+	
+	<select id="getMainNews" resultType="News" resultMap="newsListMap">
+		SELECT a.*
+		FROM article a
+		JOIN (
+		    SELECT category, MAX(read_count) AS max_read_count
+		    FROM article
+		    WHERE reg_date BETWEEN DATE_ADD(NOW(), INTERVAL -7 DAY) AND NOW()
+		    GROUP BY category
+		) b ON a.category = b.category AND a.read_count = b.max_read_count
+		WHERE a.reg_date BETWEEN DATE_ADD(NOW(), INTERVAL -7 DAY) AND NOW() order by a.read_count desc
+	</select>
+	
+	<resultMap id="newsListMap" type="News">
+		<id property="no" column="no"/>
+		<result property="category" column="category"/>
+		<result property="title" column="title"/>
+		<result property="thumbnail" column="thumbnail"/>
+		<result property="description" column="description"/>
+		<result property="content" column="content"/>
+		<result property="regDate" column="reg_date"/>
+		<result property="modifyDate" column="modify_date"/>
+		<result property="likeCount" column="like_count"/>
+		<result property="hateCount" column="hate_count"/>
+		<result property="readCount" column="read_count"/>
+	</resultMap>
+
+</mapper>
