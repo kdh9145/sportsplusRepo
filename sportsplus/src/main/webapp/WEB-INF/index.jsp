@@ -36,7 +36,7 @@
 		<div class="row">
 			<div class="col text-end m-3 d-flex justify-content-end">
 				<div style="width: fit-content; cursor: pointer;" id="searchClose">
-					<span class="fs-5 fw-bold">검색창 X</span>
+					<span class="fs-5 fw-bold">검색창 닫기.</span>
 				</div>
 			</div>
 		</div>
